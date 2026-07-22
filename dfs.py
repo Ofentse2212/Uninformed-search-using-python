@@ -1,18 +1,26 @@
-cat > dfs.py << 'EOF'
+"""Depth-first traversal for an adjacency-list graph."""
+
+
 def dfs(graph, start):
-    visited = []
+    """Return nodes in deterministic depth-first order from *start*."""
+    if start not in graph:
+        raise ValueError(f"Unknown start node: {start}")
+
+    order = []
+    visited = set()
     stack = [start]
 
     while stack:
         node = stack.pop()
+        if node in visited:
+            continue
 
-        if node not in visited:
-            visited.append(node)
+        visited.add(node)
+        order.append(node)
+        stack.extend(
+            neighbor
+            for neighbor in reversed(graph.get(node, []))
+            if neighbor not in visited
+        )
 
-            # Reverse to keep traversal order predictable
-            for neighbor in reversed(graph.get(node, [])):
-                if neighbor not in visited:
-                    stack.append(neighbor)
-
-    return visited
-EOF
+    return order
