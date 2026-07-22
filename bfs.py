@@ -1,19 +1,24 @@
-cat > bfs.py << 'EOF'
+"""Breadth-first traversal for an adjacency-list graph."""
+
 from collections import deque
 
+
 def bfs(graph, start):
-    visited = []
+    """Return nodes in breadth-first order from *start*."""
+    if start not in graph:
+        raise ValueError(f"Unknown start node: {start}")
+
+    order = []
+    visited = {start}
     queue = deque([start])
 
     while queue:
         node = queue.popleft()
+        order.append(node)
 
-        if node not in visited:
-            visited.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
 
-            for neighbor in graph.get(node, []):
-                if neighbor not in visited:
-                    queue.append(neighbor)
-
-    return visited
-EOF
+    return order
