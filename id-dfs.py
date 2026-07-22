@@ -1,11 +1,12 @@
-cat > id-dfs.py << 'EOF'
+"""Iterative-deepening depth-first search."""
+
+
 def depth_limited_search(graph, node, depth_limit, visited):
-    if depth_limit < 0:
+    """Visit reachable nodes without exploring beyond *depth_limit*."""
+    if depth_limit < 0 or node in visited:
         return
 
-    if node not in visited:
-        visited.append(node)
-
+    visited.append(node)
     if depth_limit == 0:
         return
 
@@ -14,15 +15,16 @@ def depth_limited_search(graph, node, depth_limit, visited):
 
 
 def iddfs(graph, start, max_depth):
-    """
-    Returns traversal per depth (correct IDDFS behavior)
-    """
-    result = {}
+    """Return the traversal produced at every depth from zero to max_depth."""
+    if start not in graph:
+        raise ValueError(f"Unknown start node: {start}")
+    if max_depth < 0:
+        raise ValueError("max_depth must be non-negative")
 
+    result = {}
     for depth in range(max_depth + 1):
         visited = []
         depth_limited_search(graph, start, depth, visited)
         result[depth] = visited
 
     return result
-EOF
