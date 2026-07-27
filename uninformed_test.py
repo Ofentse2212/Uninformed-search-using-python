@@ -1,64 +1,38 @@
-import networkx as nx
-import matplotlib.pyplot as plt
+"""Executable demonstration and regression tests for the search algorithms."""
+
+import importlib
+import unittest
+
 from bfs import bfs
 from dfs import dfs
-import importlib
-id_dfs_module = importlib.import_module('id-dfs')
-iddfs = id_dfs_module.iddfs
 
-# Your graph - represents the tree diagram exactly
-graph = {
-    'A': ['B', 'C'],
-    'B': ['D', 'E'],
-    'C': ['F'],
-    'D': [],
-    'E': ['G'],
-    'F': [],
-    'G': []
+iddfs = importlib.import_module("id-dfs").iddfs
+
+GRAPH = {
+    "A": ["B", "C"],
+    "B": ["D", "E"],
+    "C": ["F"],
+    "D": [],
+    "E": ["G"],
+    "F": [],
+    "G": [],
 }
 
-# Create directed graph
-G = nx.DiGraph()
 
-# Add edges
-for node, neighbors in graph.items():
-    for neighbor in neighbors:
-        G.add_edge(node, neighbor)
+class SearchAlgorithmTests(unittest.TestCase):
+    def test_bfs_visits_level_by_level(self):
+        self.assertEqual(bfs(GRAPH, "A"), ["A", "B", "C", "D", "E", "F", "G"])
 
-# Manual hierarchical positions to match the diagram exactly
-# A at top, B-C below, D-E-F below that, G below E
-pos = {
-    'A': (0, 3),
-    'B': (-1, 2),
-    'C': (1, 2),
-    'D': (-1.5, 1),
-    'E': (-0.5, 1),
-    'F': (1, 1),
-    'G': (-0.5, 0)
-}
+    def test_dfs_is_deterministic(self):
+        self.assertEqual(dfs(GRAPH, "A"), ["A", "B", "D", "E", "G", "C", "F"])
 
-# Draw
-plt.figure(figsize=(8, 6))
+    def test_iddfs_expands_the_depth_limit(self):
+        self.assertEqual(iddfs(GRAPH, "A", 2)[2], ["A", "B", "D", "E", "C", "F"])
 
-nx.draw(
-    G, pos,
-    with_labels=True,
-    node_color='lightblue',
-    node_size=2000,
-    font_size=12,
-    font_weight='bold',
-    arrows=True,
-    arrowsize=15,
-    edge_color='black',
-    linewidths=1,
-    width=1.5
-)
+    def test_unknown_start_is_rejected(self):
+        with self.assertRaises(ValueError):
+            bfs(GRAPH, "Z")
 
-plt.title("Graph Representation")
-plt.axis('off')  # Hide axes for cleaner look
-plt.tight_layout()
-plt.show()
 
-print("BFS:", bfs(graph, 'A'))
-print("DFS:", dfs(graph, 'A'))
-print("IDDFS:", iddfs(graph, 'A', 3))
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
